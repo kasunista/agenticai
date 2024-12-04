@@ -1,0 +1,49 @@
+parameters:
+  webAppName:
+    type: string
+    defaultValue: "istawebapp"
+  location:
+    type: string
+    defaultValue: "westeurope"
+  sku:
+    type: string
+    defaultValue: "B1"
+
+resources:
+  - type: Microsoft.Web/serverfarms
+    apiVersion: "2021-02-01"
+    name: "[parameters('webAppName')]"
+    location: "[parameters('location')]"
+    sku:
+      name: "[parameters('sku')]"
+    properties:
+      reserved: true
+      isXenon: false
+      hyperV: false
+      targetWorkerSizeId: 0
+      targetWorkerCount: 1
+
+  - type: Microsoft.Web/sites
+    apiVersion: "2021-02-01"
+    name: "[parameters('webAppName')]"
+    location: "[parameters('location')]"
+    dependsOn:
+      - "[resourceId('Microsoft.Web/serverfarms', parameters('webAppName'))]"
+    properties:
+      serverFarmId: "[resourceId('Microsoft.Web/serverfarms', parameters('webAppName'))]"
+      siteConfig:
+        pythonVersion: "3.9"
+        linuxFxVersion: "PYTHON|3.9"
+        appSettings:
+          - name: SCM_DO_BUILD_DURING_DEPLOYMENT
+            value: "true"
+          - name: WEBSITES_PORT
+            value: "8000"
+          - name: WEBSITE_HTTPLOGGING_RETENTION_DAYS
+            value: "7"
+          - name: DOCKER_REGISTRY_SERVER_URL
+            value: "https://index.docker.io"
+        http20Enabled: true
+        minTlsVersion: "1.2"
+        ftpsState: "Disabled"
+      httpsOnly: true
