@@ -1,0 +1,9 @@
+{
+    "AZURE_SEARCH_SERVICE_NAME": "istaaisearch",
+    "AZURE_SEARCH_API_KEY": "ce2AnGKFdJzzRSd6qPg3SRB3fPyT6ZQSxLcEcMutgcAzSeBSmaoO",
+    "AZURE_OPENAI_API_KEY": "FqJ7gt2glQEzMRYdt6rBSkJoCM9fshp3FhQ6KdyNVNbonMNNatkFJQQJ99AKACHYHv6XJ3w3AAAAACOG352B",
+    "AZURE_OPENAI_ENDPOINT": "https://ai-magedaragama5392ai531594306396.cognitiveservices.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview",
+    "AZURE_COSMOS_ENDPOINT": "AccountEndpoint=https://istacosmodb.documents.azure.com:443/;AccountKey=pksrWISapK6708oGr197ABKO4vx8iKmzEltFadKGWj4htppJTOAGEKNWF81FRWQg2ef4R6kFh4DbACDbL4Ql7w==",
+    "AZURE_COSMOS_KEY": "pksrWISapK6708oGr197ABKO4vx8iKmzEltFadKGWj4htppJTOAGEKNWF81FRWQg2ef4R6kFh4DbACDbL4Ql7w==",
+    "AZURE_STORAGE_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=istaagentaistorage;AccountKey=LFbYIDIEChUei+0xA61uR5KuZcTAuuUzJmQMwJGeyH3NHAHJxBDlMVIq1I9rKE+UH0c42+svxqJh+AStMvL2Cg==;EndpointSuffix=core.windows.net"
+}
