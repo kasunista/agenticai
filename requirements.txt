@@ -1,0 +1,11 @@
+streamlit
+langchain
+openai
+azure-identity
+azure-search-documents
+azure-storage-blob
+azure-cosmos
+python-dotenv
+PyPDF2
+langchain-openai
+tiktoken 
