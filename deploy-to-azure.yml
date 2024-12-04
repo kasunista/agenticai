@@ -4,33 +4,75 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  AZURE_WEBAPP_NAME: istawebapp
+  PYTHON_VERSION: '3.9'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
-    
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
-    
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Create and start virtual environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+        pip install gunicorn
+
+    - name: Create deployment package
+      run: |
+        zip -r deploy.zip . -x "venv/*" "*.git*"
+
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'istawebapp'
-        slot-name: 'production'
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: .
+        package: deploy.zip
+
+    - name: Configure Azure Web App Settings
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az webapp config set --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group istadigx \
+            --linux-fx-version "PYTHON|${{ env.PYTHON_VERSION }}" \
+            --startup-file "startup.sh"
+
+          az webapp config appsettings set --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group istadigx \
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
+              WEBSITES_PORT=8000 \
+              PYTHON_VERSION=${{ env.PYTHON_VERSION }} \
+              AZURE_SEARCH_SERVICE_NAME=${{ secrets.AZURE_SEARCH_SERVICE_NAME }} \
+              AZURE_SEARCH_API_KEY=${{ secrets.AZURE_SEARCH_API_KEY }} \
+              AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }} \
+              AZURE_OPENAI_ENDPOINT=${{ secrets.AZURE_OPENAI_ENDPOINT }} \
+              AZURE_COSMOS_ENDPOINT=${{ secrets.AZURE_COSMOS_ENDPOINT }} \
+              AZURE_COSMOS_KEY=${{ secrets.AZURE_COSMOS_KEY }} \
+              AZURE_STORAGE_CONNECTION=${{ secrets.AZURE_STORAGE_CONNECTION }}
+
+    - name: Verify deployment
+      run: |
+        echo "Deployed to https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
